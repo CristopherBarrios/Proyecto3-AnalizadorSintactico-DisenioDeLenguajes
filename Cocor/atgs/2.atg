@@ -1,0 +1,59 @@
+COMPILER Double    
+
+CHARACTERS 
+
+digit = "0123456789" .
+tab = CHR(9).
+eol = CHR(10).
+blanco = eol + CHR(13) + tab + ' '.
+
+TOKENS
+
+number = digit{digit}.
+decnumber = digit{digit} "." digit{digit}.
+white = blanco{blanco}.
+
+PRODUCTIONS
+
+     Expr = 
+     StatSeq .
+
+     StatSeq = 
+     { Stat $ ";" { white } } { white } .
+
+     Stat = 
+     (. value = 0 .) $
+      Expression<out value>    $    (. print("Operations Result: ", value) .)
+      .
+
+     Expression<out result> = 
+      (. result1 = 0; result2 = 0 .) $ Term<out result1>
+       {   (& "+" $ Term<out result2>  $ (. result1 += result2 .) &)
+       |   (& "-" $ Term<out result2>  $ (. result1 -= result2 .) &)
+       }            $                  (. result = result1 .)
+       .
+
+     Term<out result> =	
+     (. result1 = 1; result2 = 1 .)  $
+     Factor<out result1>
+     {    (& '*' $ Factor<out result2> $ (. result1 *= result2 .) &)
+      | (& '/' $ Factor<out result2>  $  (. result1 /= result2 .) &)
+     }          $                  (. result = result1 .)
+     .
+	
+    Factor<out result> =            
+    (. sign = 1 .)
+      [ "-"       $                  (. sign = -1 .)
+      ]
+      (&   Number<out result> (. result *= sign .) &)
+     | (& "(" $ Expression<out result> $ ")" (. result *= sign .)
+      &)      $                      
+      .
+
+   Number<out result> = 
+    (& number &)
+    |
+    (& decnumber &) $ (. result = float(self.getNumber()) .)
+    .
+
+END Double

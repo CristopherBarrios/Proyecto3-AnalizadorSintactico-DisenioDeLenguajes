@@ -1,0 +1,43 @@
+COMPILER Aritmetica    
+
+CHARACTERS 
+
+letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz". 
+digit = "0123456789" .
+tab = CHR(9).
+eol = CHR(10).
+
+TOKENS
+
+ident = letter{letter|digit} EXCEPT KEYWORDS.
+number = digit{digit}.
+
+PRODUCTIONS
+
+Expr= {Stat ";"}".".
+
+Stat = 							(.int value;.)
+	Expression< ref value>		(.System.Console.WriteLn(value.ToString());.)
+	.
+
+Expression<ref int result> =		(.int result1,result2;.)
+	Term< ref result1>
+	{    "+"Term< ref result2>		(.result1+=result2;.)
+	   | "-"Term< ref result2>		(.result1-=result2;.)
+	}							(.result=result1;.)
+	.
+
+Term<ref int result>=				(.int result1,result2;.)
+	Factor<ref result1>
+	{    "*"Factor<ref result2>	(.result1*=result2;.)
+	   | "/"Factor<ref result2>	(.result1/=result2;.)
+	}							(.result=result1;.)
+	.
+	
+Factor<ref int result> =	(.int signo=1;.)
+	["-"(.signo = -1;.)]
+	( Number<ref result> | "("Expression< ref result>")") (.result*=signo;.).
+	
+Number<ref int result> =  number (. result = int.Parse(lastToken.Value).).
+
+END Aritmetica
